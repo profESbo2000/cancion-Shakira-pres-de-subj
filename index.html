@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller ELE: Que me quedes tú - Shakira</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Permanent+Marker&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['Poppins', 'sans-serif'],
+                        marker: ['Permanent Marker', 'cursive'],
+                        sans: ['Fredoka', 'sans-serif'],
+                    },
+                    colors: {
+                        music: {
+                            gold: '#f59e0b',
+                            purple: '#8b5cf6',
+                            rose: '#f43f5e',
+                            dark: '#0f172a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            background-image: radial-gradient(#1e293b 2px, transparent 2px);
+            background-size: 32px 32px;
+        }
+
+        .vinyl-record {
+            animation: spin 12s linear infinite;
+        }
+        .vinyl-paused {
+            animation-play-state: paused;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Animación de Ondas / Decibeles */
+        .eq-bar {
+            width: 4px;
+            background: linear-gradient(to top, #f59e0b, #ef4444);
+            border-radius: 9999px;
+            height: 20%;
+            transition: height 0.2s ease;
+        }
+
+        .eq-active .eq-bar:nth-child(1) { animation: bounce 0.6s ease-in-out infinite alternate; }
+        .eq-active .eq-bar:nth-child(2) { animation: bounce 0.8s ease-in-out infinite alternate 0.2s; }
+        .eq-active .eq-bar:nth-child(3) { animation: bounce 0.5s ease-in-out infinite alternate 0.4s; }
+        .eq-active .eq-bar:nth-child(4) { animation: bounce 0.9s ease-in-out infinite alternate 0.1s; }
+        .eq-active .eq-bar:nth-child(5) { animation: bounce 0.7s ease-in-out infinite alternate 0.3s; }
+
+        @keyframes bounce {
+            0% { height: 15%; }
+            100% { height: 100%; }
+        }
+
+        .card-music {
+            background: #1e293b;
+            border: 3px solid #334155;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            border-radius: 1.5rem;
+        }
+
+        .correct-input {
+            border-color: #10b981 !important;
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+
+        .incorrect-input {
+            border-color: #f43f5e !important;
+            background-color: #881337 !important;
+            color: #fecdd3 !important;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col font-sans pb-12">
+
+    <!-- Encabezado Musical con Fuente Legible -->
+    <header class="bg-slate-900 border-b-2 border-slate-700 px-6 py-4 shadow-xl">
+        <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl text-amber-400">🎵</span>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-heading font-extrabold tracking-wider text-amber-400 leading-none uppercase">
+                        RITMO Y GRAMÁTICA
+                    </h1>
+                    <span class="text-xs font-semibold text-slate-400">
+                        Práctica de Presente de Subjuntivo en Canciones
+                    </span>
+                </div>
+            </div>
+            <div class="bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs px-3 py-1.5 rounded-full flex items-center gap-2">
+                <i class="fa-solid fa-microphone-lines"></i>
+                <span>Nivel ELE: B1 / B2</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full space-y-8">
+
+        <!-- Reproductor Musical con Portada y Animación de Decibeles -->
+        <section class="card-music p-6 sm:p-8 relative overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                
+                <!-- Ilustración / Disco de Vinilo con Ecualizador Trasero -->
+                <div class="flex justify-center relative">
+                    
+                    <!-- Barras Animadas de Decibeles (Detrás del vinilo) -->
+                    <div id="equalizer" class="absolute -inset-4 flex items-center justify-between px-6 opacity-80 pointer-events-none">
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                    </div>
+
+                    <div class="relative w-44 h-44 sm:w-48 sm:h-48 z-10">
+                        <!-- Disco de Vinilo Giratorio -->
+                        <div id="vinyl" class="vinyl-record vinyl-paused absolute inset-0 rounded-full bg-slate-950 border-4 border-slate-800 flex items-center justify-center shadow-2xl">
+                            <div class="w-16 h-16 rounded-full bg-amber-500 border-4 border-slate-950 flex items-center justify-center">
+                                <div class="w-4 h-4 rounded-full bg-slate-950"></div>
+                            </div>
+                        </div>
+                        <!-- Foto de Shakira -->
+                        <img src="shakira.jpg" 
+                             alt="Shakira" 
+                             class="absolute -bottom-2 -left-2 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-amber-400 object-cover shadow-lg">
+                    </div>
+                </div>
+
+                <!-- Detalles y Reproductor de Audio -->
+                <div class="md:col-span-2 space-y-4 text-center md:text-left">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Ejercicio 10 • Subjuntivo</span>
+                        <h2 class="text-3xl sm:text-4xl font-marker text-white mt-1">Que Me Quedes Tú</h2>
+                        <p class="text-slate-400 font-medium">Shakira — <em class="text-slate-300">Grandes Éxitos</em></p>
+                    </div>
+
+                    <!-- Panel de Audio -->
+                    <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-700/80 space-y-2">
+                        <label for="audio-player" class="text-xs text-amber-300/80 font-semibold block">
+                            <i class="fa-solid fa-compact-disc mr-1"></i> Reproductor de audio
+                        </label>
+                        <audio id="audio-player" controls class="w-full h-10 rounded-lg">
+                            <source src="cancion shakira.mp3" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Sección de Letra y Ejercicio Completo -->
+        <section class="card-music p-6 sm:p-8 space-y-6">
+            <div class="border-b border-slate-700 pb-4">
+                <h3 class="text-2xl font-marker text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-xl"></i>
+                    10. Completa los huecos con la forma correcta del subjuntivo
+                </h3>
+                <p class="text-sm text-slate-400 mt-1">
+                    Escucha la canción y conjuga los verbos en **Presente de Subjuntivo**.
+                </p>
+            </div>
+
+            <!-- Contenedor de la Letra de la Canción -->
+            <div class="space-y-6 font-medium text-base sm:text-lg leading-relaxed text-slate-200">
+                
+                <!-- Estrofa 1 -->
+                <div class="bg-slate-900/50 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <p>Que se <span class="font-bold text-amber-400">arruinen</span> los canales de noticias</p>
+                    <p>Con lo mucho que odio la televisión</p>
+                    <p class="flex flex-wrap items-center gap-2">
+                        Que se 
+                        <input type="text" id="q1" placeholder="(1)" class="bg-slate-800 border-2 border-slate-600 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400">
+                        anticuadas las sonrisas
+                    </p>
+                    <p>Y se extingan todas las puestas de sol</p>
+                    <p class="flex flex-wrap items-center gap-2">
+                        Que se 
+                        <input type="text" id="q2" placeholder="(2)" class="bg-slate-800 border-2 border-slate-600 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400">
+                        las doctrinas y deberes
+                    </p>
+                    <p>Que se <span class="font-bold text-amber-400">terminen</span> las películas de acción</p>
+                    <p class="flex flex-wrap items-center gap-2">
+                        Que se 
+                        <input type="text" id="q3" placeholder="(3)" class="bg-slate-800 border-2 border-slate-600 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400">
+                        en el mundo los placeres
+                    </p>
+                    <p class="flex flex-wrap items-center gap-2">
+                        Y que se 
+                        <input type="text" id="q4" placeholder="(4)" class="bg-slate-800 border-2 border-slate-600 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400">
+                        hoy una última canción
+                    </p>
+                </div>
+
+                <!-- Puente / Estribillo Parcial -->
+                <div class="bg-amber-500/10 p-5 rounded-2xl border border-amber-500/30 text-amber-100 space-y-2">
+                    <p>Pero que me quedes tú, me quede tu abrazo</p>
+                    <p>Y el beso que inventas cada día</p>
+                    <p class="flex flex-wrap items-center gap-2">
+                        Y que me 
+                        <input type="text" id="q5" placeholder="(5)" class="bg-slate-800 border-2 border-amber-500/50 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400">
+                        aquí después del ocaso
+                    </p>
+                    <p>Para siempre tu melancolía</p>
+                    <p class="text-sm font-semibold text-amber-300 pt-2">
+                        Porque yo, ya lo sé, sí • Que dependo de ti • Si me quedas tú me queda la vida
+                    </p>
+                </div>
+
+                <!-- Estrofa 2 -->
+                <div class="bg-slate-900/50 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <p class="flex flex-wrap items-center gap-2">
+                        Que 
+                        <input type="text" id="q6" placeholder="(6)" class="bg-slate-800 border-2 border-slate-600 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400">
+                        todos los vecinos
+                    </p>
+                    <p>Y se coman las sobras de mi inocencia</p>
+                    <p class="flex flex-wrap items-center gap-2">
+                        Que se 
+                        <input type="text" id="q7" placeholder="(7)" class="bg-slate-800 border-2 border-slate-600 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400">
+                        uno a uno los amigos
+                    </p>
+                    <p>Y acribillen mi pedazo de conciencia</p>
+                    <p class="flex flex-wrap items-center gap-2">
+                        Que se 
+                        <input type="text" id="q8" placeholder="(8)" class="bg-slate-800 border-2 border-slate-600 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400">
+                        las palabras en los labios
+                    </p>
+                    <p>Que contaminen todo el agua del planeta</p>
+                    <p>O que renuncien los filántropos y sabios</p>
+                    <p class="flex flex-wrap items-center gap-2">
+                        Y que se 
+                        <input type="text" id="q9" placeholder="(9)" class="bg-slate-800 border-2 border-slate-600 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400">
+                        hoy hasta el último poeta
+                    </p>
+                </div>
+
+                <!-- Cuadro Informativo -->
+                <div class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-center text-xs text-slate-400 italic">
+                    * Estribillo: «Que me quedes tú, me quede tu abrazo / Y el beso que inventas cada día...»
+                </div>
+
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex flex-wrap items-center justify-center gap-4 pt-6 border-t border-slate-700">
+                <button onclick="checkAnswers()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-8 py-3 rounded-xl shadow-lg transition">
+                    <i class="fa-solid fa-check-double mr-2"></i> Verificar Respuestas
+                </button>
+                <button onclick="resetAnswers()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-6 py-3 rounded-xl border border-slate-600 transition">
+                    <i class="fa-solid fa-rotate-left mr-2"></i> Reiniciar
+                </button>
+            </div>
+
+            <div id="score-display" class="text-center font-marker text-xl h-6"></div>
+        </section>
+
+    </main>
+
+    <footer class="text-center text-xs text-slate-500 py-4">
+        Material didáctico para la enseñanza de ELE (Español Lengua Extranjera)
+    </footer>
+
+    <script>
+        const answers = {
+            q1: ["vuelvan"],
+            q2: ["caigan"],
+            q3: ["agoten"],
+            q4: ["escriba"],
+            q5: ["acompañe"],
+            q6: ["mueran"],
+            q7: ["vayan"],
+            q8: ["sequen"],
+            q9: ["ahogue"]
+        };
+
+        // Animación del disco y los decibeles al reproducir audio
+        const audio = document.getElementById('audio-player');
+        const vinyl = document.getElementById('vinyl');
+        const equalizer = document.getElementById('equalizer');
+
+        audio.addEventListener('play', () => {
+            vinyl.classList.remove('vinyl-paused');
+            equalizer.classList.add('eq-active');
+        });
+
+        audio.addEventListener('pause', () => {
+            vinyl.classList.add('vinyl-paused');
+            equalizer.classList.remove('eq-active');
+        });
+
+        audio.addEventListener('ended', () => {
+            vinyl.classList.add('vinyl-paused');
+            equalizer.classList.remove('eq-active');
+        });
+
+        function normalizeText(str) {
+            return str.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function checkAnswers() {
+            let score = 0;
+            const total = Object.keys(answers).length;
+
+            for (let id in answers) {
+                const input = document.getElementById(id);
+                const val = normalizeText(input.value);
+                const validOptions = answers[id].map(a => normalizeText(a));
+
+                if (validOptions.includes(val)) {
+                    input.className = "bg-slate-800 border-2 rounded-lg px-3 py-1 w-28 text-center font-bold focus:outline-none correct-input";
+                    score++;
+                } else {
+                    input.className = "bg-slate-800 border-2 rounded-lg px-3 py-1 w-28 text-center font-bold focus:outline-none incorrect-input";
+                }
+            }
+
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.innerText = `Puntuación: ${score} / ${total}`;
+            scoreDisplay.className = score === total ? "text-center font-marker text-2xl text-emerald-400" : "text-center font-marker text-2xl text-amber-400";
+
+            if (score === total) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        function resetAnswers() {
+            for (let id in answers) {
+                const input = document.getElementById(id);
+                input.value = '';
+                input.className = "bg-slate-800 border-2 border-slate-600 rounded-lg px-3 py-1 text-amber-300 w-28 text-center font-bold focus:outline-none focus:border-amber-400";
+            }
+            document.getElementById('score-display').innerText = '';
+        }
+    </script>
+</body>
+</html>
